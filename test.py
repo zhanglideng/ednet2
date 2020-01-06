@@ -14,7 +14,6 @@ import cv2
 from Res_ED_model import CNN
 import torch
 from utils.loss import *
-from utils.ssim import *
 
 test_path = '/input/data/nyu/test_visual/'
 gth_path = '/input/data/nyu/gth/'
