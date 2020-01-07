@@ -16,6 +16,7 @@ class EdDataSet(Dataset):
         self.haze_data_list = os.listdir(self.haze_path)
         self.gt_data_list = os.listdir(self.gt_path)
         # self.gt_depth_list = os.listdir(self.depth_path)
+        self.haze_data_list.sort(key=lambda x: float(x[-8:-4]))
         self.haze_data_list.sort(key=lambda x: int(x[:-30]))
         self.gt_data_list.sort(key=lambda x: int(x[:-4]))
 
@@ -34,30 +35,14 @@ class EdDataSet(Dataset):
         haze_image_name = self.haze_data_list[idx]
         haze_image = cv2.imread(self.haze_path + '/' + haze_image_name)
         gt_image = cv2.imread(self.gt_path + '/' + haze_image_name[:-30] + '.bmp')
-        # print(gt_image.shape)
-        # data = sio.loadmat(self.depth_path + '/' + haze_image_name[:-30] + '.mat')
-        # gt_depth = data["depths"]
-        # gt_depth = gt_depth[:, :, np.newaxis]
-        # print(gt_depth.shape)
-        # print(haze_image.shape)
-        # haze_fog = float(haze_image_name[-8:-4])
-        # gt_fog = 0.01
-        # gt_depth = gt_depth * gt_fog
-        # print(haze_image.type)
-        # haze_depth = gt_depth * haze_fog
-        # print(haze_depth)
-        # print(gt_depth)
         if self.transform1:
             haze_image = self.transform1(haze_image)
             gt_image = self.transform1(gt_image)
-        # if self.transform2:
-        #    gt_depth = self.transform2(gt_depth)
-        #    haze_depth = self.transform2(haze_depth)
-        # 暂不传递大气光值
         return haze_image, gt_image
 
 
 if __name__ == '__main__':
+    '''
     train_haze_path = './data/train/'
     validation_haze_path = './data/validation/'
     test_haze_path = './data/test/'
@@ -80,3 +65,4 @@ if __name__ == '__main__':
         # print(gt.shape)
         count += 1
     print('count:' + str(count))
+    '''
