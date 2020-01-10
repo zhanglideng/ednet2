@@ -27,9 +27,9 @@ from utils.loss import *
     由于本次需要t作为Gth，故3不做测试。
 """
 
-test_visual_path = '/input/data/nyu/test_visual/'
-test_path = '/input/data/nyu/test/'
-gth_path = '/input/data/nyu/gth/'
+test_visual_path = '/input/data/nyu/cut_test_visual/'
+test_path = '/input/data/nyu/cut_test/'
+gth_path = '/input/data/nyu/cut_gth/'
 test_rw_path = '/input/data/hazy_realworld/'  # rw = real world
 BATCH_SIZE = 2
 
