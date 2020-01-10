@@ -9,16 +9,19 @@ import scipy.io as sio
 
 class EdDataSet(Dataset):
     def __init__(self, transform1, path=None):
-        print(path)
         self.transform1 = transform1
         self.haze_path, self.gt_path = path
         # self.haze_path, self.gt_path, self.depth_path = path
         self.haze_data_list = os.listdir(self.haze_path)
-        self.gt_data_list = os.listdir(self.gt_path)
-        # self.gt_depth_list = os.listdir(self.depth_path)
-        self.haze_data_list.sort(key=lambda x: float(x[-8:-4]))
-        self.haze_data_list.sort(key=lambda x: int(x[:-30]))
-        self.gt_data_list.sort(key=lambda x: int(x[:-4]))
+        if self.gt_path:
+            self.haze_data_list.sort(key=lambda x: float(x[-8:-4]))
+            self.haze_data_list.sort(key=lambda x: int(x[:-30]))
+            self.gt_data_list = os.listdir(self.gt_path)
+            self.gt_data_list.sort(key=lambda x: int(x[:-4]))
+            self.is_Gth = True
+        else:
+            self.haze_data_list.sort(key=lambda x: int(x[:-4]))
+            self.is_Gth = False
 
     def __len__(self):
         return len(os.listdir(self.haze_path))
@@ -34,10 +37,14 @@ class EdDataSet(Dataset):
         """
         haze_image_name = self.haze_data_list[idx]
         haze_image = cv2.imread(self.haze_path + '/' + haze_image_name)
-        gt_image = cv2.imread(self.gt_path + '/' + haze_image_name[:-30] + '.bmp')
         if self.transform1:
             haze_image = self.transform1(haze_image)
-            gt_image = self.transform1(gt_image)
+        if self.is_Gth:
+            gt_image = cv2.imread(self.gt_path + '/' + haze_image_name[:-30] + '.bmp')
+            if self.transform1:
+                gt_image = self.transform1(gt_image)
+        else:
+            gt_image = False
         return haze_image, gt_image
 
 
