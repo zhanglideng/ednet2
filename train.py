@@ -19,7 +19,7 @@ EPOCH = 100  # 轮次
 BATCH_SIZE = 2  # 批大小
 excel_train_line = 1  # train_excel写入的行的下标
 excel_val_line = 1  # val_excel写入的行的下标
-alpha = 1  # 损失函数的权重
+weights = [1, 1, 1, 1, 0.01]  # 损失函数的权重
 accumulation_steps = 1  # 梯度积累的次数，类似于batch-size=64
 itr_to_lr = 10000 // BATCH_SIZE  # 训练10000次后损失下降50%
 itr_to_excel = 64 // BATCH_SIZE  # 训练64次后保存相关数据到excel
@@ -85,8 +85,8 @@ for epoch in range(EPOCH):
         loss_train, loss_ob = loss_function(
             [gt_image, output_image, gt_scene_feature, dehaze_image, hazy_scene_feature])
         temp = []
-        for x in loss_train:
-            loss += x
+        for x in range(loss_train):
+            loss += loss_train[x] * weights[x]
             temp.append(x.item())
         for x in loss_ob:
             temp.append(x.item())
@@ -143,8 +143,6 @@ for epoch in range(EPOCH):
             loss_train, loss_ob = loss_function(
                 [gt_image, output_image, gt_scene_feature, dehaze_image, hazy_scene_feature])
             temp = []
-            for x in loss_train:
-                temp.append(x.item())
             for x in loss_ob:
                 temp.append(x.item())
             for x in range(len(temp)):
@@ -152,7 +150,7 @@ for epoch in range(EPOCH):
     train_epo_loss = train_epo_loss / len(train_data_loader)
     for x in range(len(loss_excel)):
         loss_excel[x] = loss_excel[x] / len(val_data_loader)
-        val_epoch_loss += loss_excel[x]
+        val_epoch_loss += loss_excel[x] * weights[x]
     print('\nepoch %d train loss = %.5f' % (epoch + 1, train_epo_loss))
     print('dehaze_l2_loss=%.5f\n'
           'dehaze_ssim_loss=%.5f\n'
