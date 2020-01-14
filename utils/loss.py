@@ -42,12 +42,14 @@ def color_loss(input_image, output_image):
     return angle.mean()
 
 
-def loss_function(image):
+def loss_function(image, weight):
     gt_image, output_image, gt_scene_feature, dehaze_image, hazy_scene_feature = image
     loss_train = [l2_loss(gt_image, dehaze_image),
                   ssim_loss(gt_image, dehaze_image),
                   l2_loss(gt_image, output_image),
                   ssim_loss(gt_image, output_image),
                   l2_loss(gt_scene_feature, hazy_scene_feature)]
-    loss_ob = []
-    return loss_train, loss_ob
+    loss_sum = 0
+    for i in range(len(loss_train)):
+        loss_sum = loss_sum + loss_train[i] * weight[i]
+    return loss_sum, loss_train

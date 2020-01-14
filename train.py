@@ -15,20 +15,20 @@ from utils.ms_ssim import *
 import os
 
 LR = 0.0004  # 学习率
-EPOCH = 100  # 轮次
+EPOCH = 20  # 轮次
 BATCH_SIZE = 2  # 批大小
-excel_train_line = 1  # train_excel写入的行的下标
-excel_val_line = 1  # val_excel写入的行的下标
-alpha = 1  # 损失函数的权重
+excel_NYU_train_line = 1  # train_excel写入的行的下标
+excel_NYU_val_line = 1  # val_excel写入的行的下标
+weight = [1, 1, 1, 1, 0.01]  # 损失函数的权重
 accumulation_steps = 1  # 梯度积累的次数，类似于batch-size=64
 itr_to_lr = 10000 // BATCH_SIZE  # 训练10000次后损失下降50%
 itr_to_excel = 64 // BATCH_SIZE  # 训练64次后保存相关数据到excel
 loss_num = 5  # 包括参加训练和不参加训练的loss
-train_haze_path = '/input/data/nyu/cut_train/'  # 去雾训练集的路径
-val_haze_path = '/input/data/nyu/cut_val/'  # 去雾验证集的路径
-gt_path = '/input/data/nyu/cut_gth/'
+NYU_train_haze_path = '/input/data/nyu/cut_train/'  # 去雾训练集的路径
+NYU_val_haze_path = '/input/data/nyu/cut_val/'  # 去雾验证集的路径
+NYU_gt_path = '/input/data/nyu/cut_gth/'
 save_path = './checkpoints/best_cnn_model.pt'  # 保存模型的路径
-excel_save = './result.xls'  # 保存excel的路径
+nyu_excel_save = './result.xls'  # 保存excel的路径
 
 '''
 def adjust_learning_rate(op, i):
@@ -128,7 +128,7 @@ for epoch in range(EPOCH):
                                            loss=loss_excel,
                                            itr_to_excel=itr_to_excel,
                                            lr=LR * (0.90 ** (itr // itr_to_lr)))
-            f.save(excel_save)
+            f.save(nyu_excel_save)
             loss_excel = [0] * loss_num
     optimizer.step()
     optimizer.zero_grad()
@@ -172,13 +172,28 @@ for epoch in range(EPOCH):
                                  loss=loss_excel,
                                  itr_to_excel=itr_to_excel,
                                  lr=LR * (0.90 ** (itr // itr_to_lr)))
-    f.save(excel_save)
+    f.save(nyu_excel_save)
     if val_epoch_loss < min_loss:
         min_loss = val_epoch_loss
         min_epoch = epoch
         torch.save(net, save_path)
         print('saving the epoch %d model with %.5f' % (epoch + 1, min_loss))
-    else:
-        print('not improve for epoch %d with %.5f' % (min_epoch, min_loss))
-    print('learning rate is ' + str(LR) + '\n')
-print('Train is Done!')
+print('Train NYU is Done!')
+
+LR = 0.0004  # 学习率
+EPOCH = 100  # 轮次
+BATCH_SIZE = 2  # 批大小
+excel_NTIRE_train_line = 1  # train_excel写入的行的下标
+excel_NTIRE_val_line = 1  # val_excel写入的行的下标
+alpha = 1  # 损失函数的权重
+accumulation_steps = 8  # 梯度积累的次数，类似于batch-size=64
+itr_to_lr = 10000 // BATCH_SIZE  # 训练10000次后损失下降50%
+itr_to_excel = 64 // BATCH_SIZE  # 训练64次后保存相关数据到excel
+loss_num = 5  # 包括参加训练和不参加训练的loss
+
+NTIRE_train_haze_path = '/input/data/nyu/cut_train/'  # 去雾训练集的路径
+NTIRE_val_haze_path = '/input/data/nyu/cut_val/'  # 去雾验证集的路径
+NTIRE_gt_path = '/input/data/nyu/cut_gth/'
+
+save_path = './checkpoints/best_cnn_model.pt'  # 保存模型的路径
+nyu_excel_save = './result.xls'  # 保存excel的路径
