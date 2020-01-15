@@ -5,6 +5,7 @@ import pickle
 import os
 import cv2
 import scipy.io as sio
+import random
 
 
 class EdDataSet(Dataset):
@@ -22,18 +23,37 @@ class EdDataSet(Dataset):
             self.haze_data_list.sort(key=lambda x: int(x[:-4]))
             self.is_Gth = False
 
+    @staticmethod
+    def random_flip(image, gt):
+        """
+        new_im = transforms.RandomHorizontalFlip(p=0.5)(im)  # p表示概率 水平翻转
+
+        # 90度，180度，270度旋转
+
+        transforms.RandomApply(transforms, p=0.5)
+        功能：给一个transform加上概率，以一定的概率执行该操作
+
+        8.随机旋转：transforms.RandomRotation
+        class torchvision.transforms.RandomRotation(degrees, resample=False, expand=False, center=None)
+        功能：依degrees随机旋转一定角度
+        参数：
+        degress- (sequence or float or int) ，若为单个数，如 30，则表示在（-30，+30）之间随机旋转
+        若为sequence，如(30，60)，则表示在30-60度之间随机旋转
+        """
+        flip = random.randint(0, 1)
+        rotate = random.randint(0, 3)
+        if flip == 0:
+            image = transforms.RandomHorizontalFlip(p=1)(image)
+            gt = transforms.RandomHorizontalFlip(p=1)(gt)
+        image = transforms.RandomRotation(rotate * 90)(image)
+        gt = transforms.RandomRotation(rotate * 90)(gt)
+        return image, gt
+
     def __len__(self):
         return len(os.listdir(self.haze_path))
 
     def __getitem__(self, idx):
-        """
-            需要传递的信息有：
-            有雾图像
-            无雾图像
-            (深度图)
-            (雾度)
-            (大气光)
-        """
+
         haze_image_name = self.haze_data_list[idx]
         haze_image = cv2.imread(self.haze_path + '/' + haze_image_name)
         if self.transform1:
@@ -44,7 +64,7 @@ class EdDataSet(Dataset):
                 gt_image = self.transform1(gt_image)
         else:
             gt_image = False
-        return haze_image, gt_image
+        return self.random_flip(haze_image, gt_image)
 
 
 if __name__ == '__main__':
@@ -72,3 +92,4 @@ if __name__ == '__main__':
         count += 1
     print('count:' + str(count))
     '''
+

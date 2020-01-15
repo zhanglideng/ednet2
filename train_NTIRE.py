@@ -14,9 +14,9 @@ import xlwt
 from utils.ms_ssim import *
 import os
 
-LR = 0.004  # 学习率
+LR = 0.04  # 学习率
 EPOCH = 100  # 轮次
-BATCH_SIZE = 2  # 批大小
+BATCH_SIZE = 3  # 批大小
 excel_NTIRE_train_line = 1  # train_excel写入的行的下标
 excel_NTIRE_val_line = 1  # val_excel写入的行的下标
 weight = [1, 1, 1, 1, 0.01]  # 损失函数的权重
@@ -103,7 +103,6 @@ for epoch in range(EPOCH):
     optimizer.step()
     optimizer.zero_grad()
     loss_excel = [0] * loss_num
-    val_epoch_loss = 0
     with torch.no_grad():
         for input_image, gt_image in val_data_loader:
             input_image = input_image.cuda()
